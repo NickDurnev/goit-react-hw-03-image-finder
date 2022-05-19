@@ -2,10 +2,10 @@ import PropTypes from 'prop-types';
 import { Gallery } from './ImageGallery.styled';
 import ImageGalleryItem from 'components/ImageGalleryItem';
 
-const ImageGallery = ({ images }) => (
+const ImageGallery = ({ images, onClick }) => (
   <Gallery id="gallery">
     {images.map(image => (
-      <ImageGalleryItem key={image.id} image={image} />
+      <ImageGalleryItem key={image.id} image={image} onClick={onClick} />
     ))}
   </Gallery>
 );
