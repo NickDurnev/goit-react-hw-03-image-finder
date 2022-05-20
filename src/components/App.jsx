@@ -25,6 +25,9 @@ export class App extends Component {
     searchValue: null,
     currentPage: 1,
     images: [],
+    totalImages: null,
+    selectImage: null,
+    selectImageDescription: null,
     status: Status.IDLE,
     error: null,
     scrollY: 0,
@@ -41,7 +44,10 @@ export class App extends Component {
       try {
         const response = await fetchImages(searchValue, currentPage);
         this.setState(prevState => {
-          return { images: [...prevState.images, ...response] };
+          return {
+            images: [...prevState.images, ...response.hits],
+            totalImages: response.total,
+          };
         });
         this.setState({ status: Status.RESOLVED });
       } catch (error) {
@@ -49,14 +55,16 @@ export class App extends Component {
         this.setState({ status: Status.REJECTED });
       }
     }
-    window.scrollBy({
-      top: scrollY * 2,
-      behavior: 'smooth',
-    });
+    if (currentPage > 1) {
+      window.scrollBy({
+        top: scrollY * 2,
+        behavior: 'smooth',
+      });
+    }
   }
 
   handleSubmit = value => {
-    this.setState({ searchValue: value, currentPage: 1 });
+    this.setState({ searchValue: value, currentPage: 1, images: [] });
   };
 
   handleLoadMore = () => {
@@ -71,9 +79,11 @@ export class App extends Component {
   };
 
   openModal = (largeImage, tags) => {
-    this.setState({ isModalOpen: true });
-    selectImage.image = largeImage;
-    selectImage.description = tags;
+    this.setState({
+      isModalOpen: true,
+      selectImage: largeImage,
+      selectImageDescription: tags,
+    });
   };
 
   closeModal = () => {
@@ -83,26 +93,36 @@ export class App extends Component {
   };
 
   render() {
-    const { status, images, isModalOpen } = this.state;
-    const { image, description } = selectImage;
+    const {
+      status,
+      images,
+      isModalOpen,
+      totalImages,
+      selectImage,
+      selectImageDescription,
+    } = this.state;
     return (
       <Container>
         <Searchbar onSubmit={value => this.handleSubmit(value)}></Searchbar>
-        {status === Status.PENDING && <Loader />}
-        {status === Status.RESOLVED && (
-          <>
-            <ImageGallery
-              images={images}
-              onClick={(largeImage, tags) => this.openModal(largeImage, tags)}
-            />
-            <Button onClick={() => this.handleLoadMore()}>Load more</Button>
-          </>
-        )}
+        <>
+          {images.length > 0 && (
+            <>
+              <ImageGallery
+                images={images}
+                onClick={(largeImage, tags) => this.openModal(largeImage, tags)}
+              />
+              {status === Status.RESOLVED && images.length < totalImages && (
+                <Button onClick={() => this.handleLoadMore()}>Load more</Button>
+              )}
+            </>
+          )}
+          {status === Status.PENDING && <Loader />}
+        </>
         {status === Status.REJECTED && <ErrorMessage />}
         {isModalOpen && (
           <Modal
-            image={image}
-            description={description}
+            image={selectImage}
+            description={selectImageDescription}
             onClose={this.closeModal}
           />
         )}

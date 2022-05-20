@@ -10,7 +10,7 @@ function fetchImages(searchValue, currentPage) {
     .get(
       `?q=${searchValue}&page=${currentPage}&key=${key}&image_type=photo&orientation=horizontal&per_page=${perPage}`
     )
-    .then(response => response.data.hits);
+    .then(response => response.data);
 }
 
 export default fetchImages;
