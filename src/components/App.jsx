@@ -4,7 +4,7 @@ import Searchbar from './Searchbar';
 import Loader from './Loader';
 import Button from './Button';
 import Modal from './Modal';
-import fetchImages from 'api';
+import fetchImages from 'services/api';
 import ImageGallery from './ImageGallery';
 import ErrorMessage from './ErrorMessage';
 
@@ -13,11 +13,6 @@ const Status = {
   PENDING: 'pending',
   RESOLVED: 'resolved',
   REJECTED: 'rejected',
-};
-
-const selectImage = {
-  image: null,
-  description: null,
 };
 
 export class App extends Component {
@@ -87,9 +82,11 @@ export class App extends Component {
   };
 
   closeModal = () => {
-    this.setState({ isModalOpen: false });
-    selectImage.image = null;
-    selectImage.description = null;
+    this.setState({
+      isModalOpen: false,
+      selectImage: null,
+      selectImageDescription: null,
+    });
   };
 
   render() {
